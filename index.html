@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>List Compare</title>
+<style>body{font:16px system-ui,sans-serif;max-width:760px;margin:1rem auto;padding:0 1rem}textarea{width:100%;box-sizing:border-box;font:inherit;padding:.4rem}button{padding:.5rem .9rem;font-size:1rem;margin:.3rem .3rem .3rem 0}.item{margin:.6rem 0}h3{margin:1rem 0 .2rem}</style></head><body>
+<h1>List Compare</h1>
+<p>Paste the main list (for example the cover page countries), then one list per item. Values can be separated by <code>;</code>, tabs or new lines. Case and extra spaces are ignored.</p>
+<h3>Main list</h3><textarea id="cover" rows="4"></textarea>
+<h3>Item lists</h3><div id="items"></div>
+<button id="add">Add item list</button><button id="go">Compare</button>
+<div id="out"></div>
+<script src="compare.js"></script>
+<script>
+const items = document.getElementById("items"), out = document.getElementById("out");
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function add() { const t = document.createElement("textarea"); t.rows = 3; t.className = "item"; t.placeholder = "Item list"; items.appendChild(t); }
+add();
+document.getElementById("add").onclick = add;
+const list = (a) => a.length ? "<ul>" + a.map((v) => "<li>" + esc(v) + "</li>").join("") + "</ul>" : "<p>None</p>";
+document.getElementById("go").onclick = () => {
+  const r = compare(document.getElementById("cover").value, [...items.children].map((t) => t.value));
+  let h = "<h2>In main list, not in any item</h2>" + list(r.onlyInCover) + "<h2>In an item, not in main list</h2>" + list(r.onlyInItems);
+  r.perItemMissingFromCover.forEach((m, i) => { h += "<h3>Item " + (i + 1) + ": not in main list</h3>" + list(m) + "<h3>Item " + (i + 1) + ": main list entries it lacks</h3>" + list(r.perItemNotInItem[i]); });
+  out.innerHTML = h;
+};
+</script></body></html>
