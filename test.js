@@ -1,0 +1,12 @@
+const assert = require("assert");
+const { parse, compare } = require("./compare");
+assert.deepStrictEqual(parse("France; germany ;Spain;;FRANCE\n Italy"), ["France", "germany", "Italy", "Spain"]);
+assert.deepStrictEqual(parse("a,b, c,d"), ["a", "b", "c", "d"]);
+assert.deepStrictEqual(parse("Korea, Republic of; Peru"), ["Korea, Republic of", "Peru"]);
+const r = compare("France; Spain; Italy; Peru", ["france; spain", "Germany; Italy"]);
+assert.deepStrictEqual(r.onlyInCover, ["Peru"]);
+assert.deepStrictEqual(r.onlyInItems, ["Germany"]);
+assert.deepStrictEqual(r.perItemMissingFromCover, [[], ["Germany"]]);
+assert.deepStrictEqual(r.perItemNotInItem, [["Italy", "Peru"], ["France", "Peru", "Spain"]]);
+assert.deepStrictEqual(compare("", [""]).onlyInCover, []);
+console.log("ok");
